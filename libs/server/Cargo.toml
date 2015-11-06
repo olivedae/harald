@@ -1,0 +1,21 @@
+[project]
+name = "haraldserver"
+version = "0.0.1"
+authors = ["Olive Dae <itsolivedae@gmail.com>"]
+
+[dependencies]
+rustc-serialize = "*"
+hyper = "*"
+iron = "*"
+valico = "*"
+diesel = "0.6.1"
+diesel_codegen = { version = "0.6.1", default-features = false, features = ["nightly", "postgres"] }
+dotenv = "0.8.0"
+dotenv_macros = "0.8.0"
+kawaii = { path = "../kawaii" }
+
+[dependencies.rustless]
+git = "https://github.com/rustless/rustless"
+
+[dependencies.curl]
+git = "https://github.com/alexcrichton/curl-rust"

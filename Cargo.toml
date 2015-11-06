@@ -1,0 +1,12 @@
+[package]
+name = "harald"
+version = "0.0.1"
+description = "A lightweight library for Bluetooth"
+readme = "README.md"
+repository = "https://github.com/olivedae/harold"
+license = "MIT"
+authors = ["Olive Dae <itsolivedae@gmail.com>"]
+keywords = ["bluetooth"]
+
+[dependencies.bytes]
+git = "https://github.com/carllerche/bytes"
