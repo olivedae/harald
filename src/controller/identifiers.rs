@@ -9,7 +9,7 @@ pub enum StreamID {
     PublicReserved(u16),
     AMPTest,
     ConnectionOriented(u16),
-    UnmatchedIDError(u16)
+    OutOfRangeIDError(u16)
 }
 
 impl StreamID {
@@ -25,7 +25,7 @@ impl StreamID {
             7 ... 62 => StreamID::PublicReserved(id),
             63 => StreamID::AMPTest,
             64 ... 65535 => StreamID::ConnectionOriented(id),
-            _ => StreamID::UnmatchedIDError(id),
+            _ => StreamID::OutOfRangeIDError(id),
         }
     }
     pub fn to_u16(&self) -> u16 {
@@ -40,7 +40,7 @@ impl StreamID {
             StreamID::PublicReserved(ref id) => *id,
             StreamID::AMPTest => 63,
             StreamID::ConnectionOriented(ref id) => *id,
-            StreamID::UnmatchedIDError(ref id) => *id,
+            StreamID::OutOfRangeIDError(ref id) => *id,
         }
     }
 }
