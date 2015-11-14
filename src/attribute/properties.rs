@@ -1,4 +1,4 @@
-enum CharacteristicProperties {
+pub enum CharacteristicProperties {
     pub Broadcast,
     pub Read,
     pub WriteWithoutResponse,
