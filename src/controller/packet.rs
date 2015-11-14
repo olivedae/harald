@@ -1,14 +1,14 @@
-use controller::identifiers::StreamID;
-use controller::data::StreamData;
+use controller::identifiers::ChannelID;
+use controller::data::ChannelData;
 
-pub struct StreamPacket {
+pub struct ChannelPacket {
     pub length: u32,
     pub id: u16,
     pub information: u64,
 }
 
-impl StreamPacket {
-    fn new(id: StreamID, payload: StreamData) {
+impl ChannelPacket {
+    fn new(id: ChannelID, payload: ChannelData) {
 
     }
 

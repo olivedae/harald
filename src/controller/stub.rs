@@ -1,5 +1,5 @@
-use controller::result::StreamResult;
-use controller::stream::BluetoothStream;
+use controller::result::ChannelResult;
+use controller::stream::BluetoothChannel;
 
 /*
 *
@@ -10,10 +10,14 @@ use controller::stream::BluetoothStream;
 *
 */
 
-pub struct StubStream;
+pub struct StubChannel;
 
-impl BluetoothStream for StubStream {
-    fn open_fixed_stream() -> StreamResult {
-        StreamResult::new()
+impl BluetoothChannel for StubChannel {
+    fn send_request() -> ChannelResult {
+        ChannelResult::new()
+    }
+
+    fn send_response() -> ChannelResult {
+        ChannelResult::new()
     }
 }

@@ -1,9 +1,9 @@
-pub struct StreamResult{
+pub struct ChannelResult{
     id: u16
 }
 
-impl StreamResult {
-    pub fn new() -> StreamResult {
-        StreamResult{ id: 5 }
+impl ChannelResult {
+    pub fn new() -> ChannelResult {
+        ChannelResult{ id: 5 }
     }
 }

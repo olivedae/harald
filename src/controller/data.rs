@@ -1,1 +1,1 @@
-pub struct StreamData;
+pub struct ChannelData;

@@ -1,4 +1,4 @@
-use controller::result::StreamResult;
+use controller::result::ChannelResult;
 
 /*
 *
@@ -6,7 +6,7 @@ use controller::result::StreamResult;
 * L2CAP Protocol in addition to the internals of the controller
 * for a given OS.
 */
-pub trait BluetoothStream {
-    fn send_request() -> StreamResult;
-    fn send_response() -> StreamResult;
+pub trait BluetoothChannel {
+    fn send_request() -> ChannelResult;
+    fn send_response() -> ChannelResult;
 }

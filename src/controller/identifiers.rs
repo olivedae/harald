@@ -1,4 +1,4 @@
-pub enum StreamID {
+pub enum ChannelID {
     PrivateReserved,
     Classic,
     Connectionless,
@@ -12,35 +12,35 @@ pub enum StreamID {
     OutOfRangeIDError(u16)
 }
 
-impl StreamID {
-    pub fn from_u16(id: u16) -> StreamID {
+impl ChannelID {
+    pub fn from_u16(id: u16) -> ChannelID {
         match id {
-            0  => StreamID::PrivateReserved,
-            1  => StreamID::Classic,
-            2  => StreamID::Connectionless,
-            3  => StreamID::AMPManagerProtocol,
-            4  => StreamID::AttributeProtocol,
-            5  => StreamID::Signaling,
-            6  => StreamID::SMP,
-            7 ... 62 => StreamID::PublicReserved(id),
-            63 => StreamID::AMPTest,
-            64 ... 65535 => StreamID::ConnectionOriented(id),
-            _ => StreamID::OutOfRangeIDError(id),
+            0  => ChannelID::PrivateReserved,
+            1  => ChannelID::Classic,
+            2  => ChannelID::Connectionless,
+            3  => ChannelID::AMPManagerProtocol,
+            4  => ChannelID::AttributeProtocol,
+            5  => ChannelID::Signaling,
+            6  => ChannelID::SMP,
+            7 ... 62 => ChannelID::PublicReserved(id),
+            63 => ChannelID::AMPTest,
+            64 ... 65535 => ChannelID::ConnectionOriented(id),
+            _ => ChannelID::OutOfRangeIDError(id),
         }
     }
     pub fn to_u16(&self) -> u16 {
         match *self {
-            StreamID::PrivateReserved => 0,
-            StreamID::Classic => 1,
-            StreamID::Connectionless => 2,
-            StreamID::AMPManagerProtocol => 3,
-            StreamID::AttributeProtocol => 4,
-            StreamID::Signaling => 5,
-            StreamID::SMP => 6,
-            StreamID::PublicReserved(ref id) => *id,
-            StreamID::AMPTest => 63,
-            StreamID::ConnectionOriented(ref id) => *id,
-            StreamID::OutOfRangeIDError(ref id) => *id,
+            ChannelID::PrivateReserved => 0,
+            ChannelID::Classic => 1,
+            ChannelID::Connectionless => 2,
+            ChannelID::AMPManagerProtocol => 3,
+            ChannelID::AttributeProtocol => 4,
+            ChannelID::Signaling => 5,
+            ChannelID::SMP => 6,
+            ChannelID::PublicReserved(ref id) => *id,
+            ChannelID::AMPTest => 63,
+            ChannelID::ConnectionOriented(ref id) => *id,
+            ChannelID::OutOfRangeIDError(ref id) => *id,
         }
     }
 }
