@@ -7,5 +7,6 @@ use controller::result::StreamResult;
 * for a given OS.
 */
 pub trait BluetoothStream {
-    fn open_fixed_stream() -> StreamResult;
+    fn send_request() -> StreamResult;
+    fn send_response() -> StreamResult;
 }
