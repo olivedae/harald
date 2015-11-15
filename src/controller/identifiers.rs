@@ -15,30 +15,30 @@ pub enum ChannelID {
 impl ChannelID {
     pub fn from_u16(id: u16) -> ChannelID {
         match id {
-            0  => ChannelID::PrivateReserved,
-            1  => ChannelID::Classic,
-            2  => ChannelID::Connectionless,
-            3  => ChannelID::AMPManagerProtocol,
-            4  => ChannelID::AttributeProtocol,
-            5  => ChannelID::Signaling,
-            6  => ChannelID::SMP,
-            7 ... 62 => ChannelID::PublicReserved(id),
-            63 => ChannelID::AMPTest,
-            64 ... 65535 => ChannelID::ConnectionOriented(id),
+            0x00  => ChannelID::PrivateReserved,
+            0x01  => ChannelID::Classic,
+            0x02  => ChannelID::Connectionless,
+            0x03  => ChannelID::AMPManagerProtocol,
+            0x04  => ChannelID::AttributeProtocol,
+            0x05  => ChannelID::Signaling,
+            0x06  => ChannelID::SMP,
+            0x07 ... 0x3e => ChannelID::PublicReserved(id),
+            0x3f => ChannelID::AMPTest,
+            0x40 ... 0xfff => ChannelID::ConnectionOriented(id),
             _ => ChannelID::OutOfRangeIDError(id),
         }
     }
     pub fn to_u16(&self) -> u16 {
         match *self {
-            ChannelID::PrivateReserved => 0,
-            ChannelID::Classic => 1,
-            ChannelID::Connectionless => 2,
-            ChannelID::AMPManagerProtocol => 3,
-            ChannelID::AttributeProtocol => 4,
-            ChannelID::Signaling => 5,
-            ChannelID::SMP => 6,
+            ChannelID::PrivateReserved => 0x00,
+            ChannelID::Classic => 0x01,
+            ChannelID::Connectionless => 0x02,
+            ChannelID::AMPManagerProtocol => 0x03,
+            ChannelID::AttributeProtocol => 0x04,
+            ChannelID::Signaling => 0x05,
+            ChannelID::SMP => 0x06,
             ChannelID::PublicReserved(ref id) => *id,
-            ChannelID::AMPTest => 63,
+            ChannelID::AMPTest => 0x3e,
             ChannelID::ConnectionOriented(ref id) => *id,
             ChannelID::OutOfRangeIDError(ref id) => *id,
         }
