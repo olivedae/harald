@@ -9,6 +9,4 @@ A modern and lightweight module for Bluetooth Smart.
 
 ## Overview
 
-A modern implementation of Bluetooth Low Energy 4.2 written in and for Rust. Using low-level, typesafe abstractions over the Bluetooth stack's various protocols and procedures, allowing for elegant logical communication between devices. 
-
-
+A modern implementation of Bluetooth Low Energy 4.2 written in and for Rust. Using low-level, type safe abstractions over the Bluetooth stack's various protocols and procedures, allowing for elegant logical communication between devices.
