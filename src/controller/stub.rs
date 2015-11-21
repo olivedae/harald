@@ -1,5 +1,5 @@
 use controller::response::ChannelResponse;
-use controller::stream::BluetoothChannel;
+use controller::stream::L2CAPStream;
 use controller::packet::ChannelPDU;
 use controller::command::Command;
 use uuid::UUID;
@@ -14,10 +14,16 @@ use controller::identifiers::ChannelID;
  *
 */
 
-pub struct StubChannel;
+pub struct Stub;
 
-impl BluetoothChannel for StubChannel {
-    fn send(address: UUID, message: ChannelPDU) -> ChannelPDU {
+impl Stub {
+    pub fn default() -> Box<Stub> {
+        Box::new(Stub)
+    }
+}
+
+impl L2CAPStream for Stub {
+    fn send(&self, address: UUID, message: ChannelPDU) -> ChannelPDU {
         ChannelPDU::new(
             ChannelID::from_u16(message.id()),
             ChannelResponse::new(Command::ConfigureResponse)

@@ -9,6 +9,6 @@ use uuid::UUID;
  *
 */
 
-pub trait BluetoothChannel {
-    fn send(address: UUID, packet: ChannelPDU) -> ChannelPDU;
+pub trait L2CAPStream {
+    fn send(&self, address: UUID, packet: ChannelPDU) -> ChannelPDU;
 }
