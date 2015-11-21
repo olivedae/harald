@@ -1,17 +1,78 @@
 use uuid::UUID;
-use peripheral::peer::PeripheralPeer as Peripheral;
+use state::*;
+use controller::stream::*;
+use central::peer::*;
 
-trait HasCentralManager {
-    fn scan(serviceUUIDs: Vec<UUID>) -> Vec<Peripheral>;
-    fn stop_scan();
-    fn connect_peripheral(periferal: Peripheral);
-    fn cancel_connection_peripheral(periferal: Peripheral);
-    fn get_peripherals_with_services();
-    fn get_peripherals_with_identifiers();
+pub struct CentralManager<'s> {
+    state: State,
+    stream: Box<L2CAPStream + 's>,
 }
 
-struct CentralManager;
+impl<'s> CentralManager<'s> {
+    pub fn new(stream: Box<L2CAPStream + 's>) -> CentralManager<'s> {
+        CentralManager {
+            state: State::Unknown,
+            stream: stream,
+        }
+    }
 
-pub fn hello_world() -> String {
-    return "Hello, world".to_string()
+    pub fn state(&self) -> State {
+        self.state.clone()
+    }
+
+    pub fn scan(&self) {
+
+    }
+
+    pub fn stop_scan(&self) {
+
+    }
+
+    pub fn found_peripherals(&self) -> Option<Vec<Peripheral>> {
+        None
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::CentralManager;
+    use controller::stub::*;
+    use state::*;
+    use central::peer::*;
+    use uuid::*;
+
+    #[test]
+    fn test_new() {
+        let manager = CentralManager::new(Stub::default());
+        assert_eq!(manager.state(), State::Unknown);
+    }
+
+    #[test]
+    fn test_empty_scan() {
+        let manager = CentralManager::new(Stub::default());
+        manager.scan();
+        assert_eq!(manager.state(), State::PoweredOn);
+        assert_eq!(manager.found_peripherals(), None);
+        manager.stop_scan();
+        assert_eq!(manager.state(), State::PoweredOff);
+    }
+
+    #[test]
+    fn test_scan_with_peripherals() {
+        let manager = CentralManager::new(Stub::default())
+        let a_uuid = UUID::as_hex("3a4f");
+        let a_peripheral = Peripheral::new(a_uuid);
+
+        /*
+         * TODO:
+         *
+         * Example of the Stub struct can included
+         * peripherals on the other end (in addition to how
+         * CentralManger and other strucutes interact with it)
+        */
+
+        manager.scan();
+        manager.stop_scan();
+        assert_eq!(manager.found_peripherals().unwrap(), vec![a_peripheral]);
+    }
 }
