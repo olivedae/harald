@@ -1,3 +1,3 @@
 pub enum UUID {
-    Device,
+    Example,
 }
