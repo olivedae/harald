@@ -1,4 +1,9 @@
 [package]
 name = "bluetooth"
 version = "0.0.1"
-authors = ["Richard Protasov <richardprotasov@gmail.com>"]
+description = "A lightweight library for Bluetooth"
+readme = "README.md"
+repository = "https://github.com/pyroar/bluetooth"
+license = "MIT"
+authors = ["Richard Protasov <richard.shlyakhov15@ncf.edu>"]
+keywords = ["bluetooth"]
