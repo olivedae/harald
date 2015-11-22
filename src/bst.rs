@@ -101,8 +101,8 @@ mod tests {
 
         for k in 0..length {
             let v = k+5;
-            map.put(k, v)
-            sorts.push(k)
+            map.put(k, v);
+            sorts.push(k);
         }
         (map, sorts.sort())
     }
@@ -124,7 +124,7 @@ mod tests {
         let (map, sorted) = settup_bst(10);
         let key = 5;
         let correct_val = key + 5;  /* settup function sets value to key + 5 */
-        assert_eq!(map.get(key), correct_val)
+        assert_eq!(map.get(key), correct_val);
     }
 
     #[test]
