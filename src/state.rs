@@ -13,12 +13,12 @@ pub enum State {
 impl State {
     fn id(&self) -> usize {
         match *self {
-            State::Unknown => 1,
-            State::Resetting => 2,
-            State::Unsupported => 3,
+            State::Unknown      => 1,
+            State::Resetting    => 2,
+            State::Unsupported  => 3,
             State::Unauthorized => 4,
-            State::PoweredOff => 5,
-            State::PoweredOn => 6,
+            State::PoweredOff   => 5,
+            State::PoweredOn    => 6,
         }
     }
 }
@@ -32,12 +32,12 @@ impl PartialEq for State {
 impl Debug for State {
     fn fmt(&self, f: &mut Formatter) -> Result {
         write!(f, "State::{}", match *self {
-            State::Unknown => "Unknown",
-            State::Resetting => "Resetting",
-            State::Unsupported => "Unsupported",
+            State::Unknown      => "Unknown",
+            State::Resetting    => "Resetting",
+            State::Unsupported  => "Unsupported",
             State::Unauthorized => "Unauthorized",
-            State::PoweredOff => "PoweredOff",
-            State::PoweredOn => "PoweredOn",
+            State::PoweredOff   => "PoweredOff",
+            State::PoweredOn    => "PoweredOn",
         })
     }
 }
@@ -45,12 +45,12 @@ impl Debug for State {
 impl Clone for State {
     fn clone(&self) -> State {
         match *self {
-            State::Unknown => State::Unknown,
-            State::Resetting => State::Resetting,
-            State::Unsupported => State::Unsupported,
+            State::Unknown      => State::Unknown,
+            State::Resetting    => State::Resetting,
+            State::Unsupported  => State::Unsupported,
             State::Unauthorized => State::Unauthorized,
-            State::PoweredOff => State::PoweredOff,
-            State::PoweredOn => State::PoweredOn,
+            State::PoweredOff   => State::PoweredOff,
+            State::PoweredOn    => State::PoweredOn,
         }
     }
 }
