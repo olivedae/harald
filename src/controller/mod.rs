@@ -5,3 +5,4 @@ pub mod identifiers;
 pub mod response;
 pub mod data;
 pub mod command;
+pub mod hci;
