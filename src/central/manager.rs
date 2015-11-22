@@ -1,18 +1,33 @@
-use uuid::UUID;
 use state::*;
-use controller::stream::*;
+use controller::hci::*;
 use central::peer::*;
+use std::thread;
+use controller::stream::*;
 
-pub struct CentralManager<'s> {
+pub struct CentralManager<'stream> {
     state: State,
-    stream: Box<L2CAPStream + 's>,
+    hci: HCI,
+    stream: &'stream (L2CAPStream + 'stream),
+    /*
+     * Currently, found_peripherals consists of a
+     * naive option type vector of Peripheral.
+     *
+     * Ideally it will use a Binary Search Tree (E.G. BSTMap)
+     * which is currently under development. Allowing for
+     * faster updates and tracking.
+    */
+    periphs: Vec<Option<Peripheral>>,
+    scan: bool,
 }
 
-impl<'s> CentralManager<'s> {
-    pub fn new(stream: Box<L2CAPStream + 's>) -> CentralManager<'s> {
+impl<'stream> CentralManager<'stream> {
+    pub fn new(hci: HCI, stream: &'stream L2CAPStream) -> CentralManager<'stream> {
         CentralManager {
             state: State::Unknown,
+            hci: hci,
             stream: stream,
+            periphs: vec![None],
+            scan: false,
         }
     }
 
@@ -20,12 +35,32 @@ impl<'s> CentralManager<'s> {
         self.state.clone()
     }
 
-    pub fn scan(&self) {
-
+    pub fn start(&mut self) {
+        match true {
+            true => self.state = State::PoweredOn,
+            false => println!("Couldn't start Bluetooth Baseband {:?}", self.state),
+        }
     }
 
-    pub fn stop_scan(&self) {
+    pub fn scan(&mut self) {
+        match self.state {
+            State::PoweredOn => self.scan = true,
+            _ => panic!("Bluetooth status is {:?}", self.state)
+        }
 
+        // let (sx, rx) = channel();
+
+        thread::spawn(move || {
+            // while self.scan {
+            //     self.stream.open(|p| sx.send(p).unwrap() );
+            // }
+        });
+
+        // rx.recv();
+    }
+
+    pub fn stop_scan(&mut self) {
+        self.scan = false;
     }
 
     pub fn found_peripherals(&self) -> Option<Vec<Peripheral>> {
@@ -36,30 +71,42 @@ impl<'s> CentralManager<'s> {
 #[cfg(test)]
 mod tests {
     use super::CentralManager;
-    use controller::stub::*;
     use state::*;
     use central::peer::*;
     use uuid::*;
+    use controller::hci::*;
+    use controller::stub::*;
 
     #[test]
     fn test_new() {
-        let manager = CentralManager::new(Stub::default());
+        let stub_stream = Stub::new();
+        let mut manager = CentralManager::new(HCI::Stub, &stub_stream);
         assert_eq!(manager.state(), State::Unknown);
     }
 
     #[test]
     fn test_empty_scan() {
-        let manager = CentralManager::new(Stub::default());
+        let stub_stream = Stub::new();
+        let mut manager = CentralManager::new(HCI::Stub, &stub_stream);
+        manager.start();
         manager.scan();
-        assert_eq!(manager.state(), State::PoweredOn);
         assert_eq!(manager.found_peripherals(), None);
         manager.stop_scan();
-        assert_eq!(manager.state(), State::PoweredOff);
+    }
+
+    #[test]
+    fn test_starting_manager() {
+        let stub_stream = Stub::new();
+        let mut manager = CentralManager::new(HCI::Stub, &stub_stream);
+        manager.start();
+        manager.scan();
+        assert_eq!(manager.state, State::PoweredOn);
     }
 
     #[test]
     fn test_scan_with_peripherals() {
-        let manager = CentralManager::new(Stub::default())
+        let mut stub_stream = Stub::new();
+        let mut manager = CentralManager::new(HCI::Stub, &stub_stream);
         let a_uuid = UUID::as_hex("3a4f");
         let a_peripheral = Peripheral::new(a_uuid);
 
@@ -70,9 +117,5 @@ mod tests {
          * peripherals on the other end (in addition to how
          * CentralManger and other strucutes interact with it)
         */
-
-        manager.scan();
-        manager.stop_scan();
-        assert_eq!(manager.found_peripherals().unwrap(), vec![a_peripheral]);
     }
 }

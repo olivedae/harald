@@ -1,9 +1,12 @@
-use controller::response::ChannelResponse;
-use controller::stream::L2CAPStream;
-use controller::packet::ChannelPDU;
-use controller::command::Command;
-use uuid::UUID;
-use controller::identifiers::ChannelID;
+extern crate hyper;
+
+use controller::response::*;
+use controller::stream::*;
+use controller::packet::*;
+use controller::command::*;
+use controller::identifiers::*;
+use uuid::*;
+use peripheral::manager::*;
 
 /*
  *
@@ -14,11 +17,23 @@ use controller::identifiers::ChannelID;
  *
 */
 
-pub struct Stub;
+pub struct Stub {
+    ads:     Option<Vec<PeripheralManager>>,
+    ads_pdu: Option<Vec<ChannelPDU>>,
+    signals: Option<Vec<ChannelPDU>>,
+}
 
 impl Stub {
-    pub fn default() -> Box<Stub> {
-        Box::new(Stub)
+    pub fn new() -> Stub {
+        Stub {
+            ads: None,
+            ads_pdu: None,
+            signals: None,
+        }
+    }
+
+    pub fn open_ads() {
+
     }
 }
 
@@ -29,4 +44,13 @@ impl L2CAPStream for Stub {
             ChannelResponse::new(Command::ConfigureResponse)
         )
     }
+
+    fn le_capable(&self) -> bool {
+        true
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
 }
