@@ -11,6 +11,7 @@ use state::*;
 
 use std::net;
 use std::thread;
+use std::sync::mpsc::channel;
 
 /*
  *
@@ -62,21 +63,69 @@ unsafe impl Sync for StubStream { }
 
 pub struct StubCloud {
     port: u16,
-    // socket: Option<net::UdpSocket>,
     ip: String,
+    bcast_mssgs: Option<Vec<Vec<u8>>>,
+    state: State,
 }
 
 impl StubCloud {
-    fn listen(&self) -> thread::JoinHandle<Vec<u8>> {
+    fn power_on(&mut self) {
+        let handle = self.listen();
+        let mut state = self.state.clone();
+        while state == State::PoweredOn {
+            thread::sleep_ms(1500);
+            state = self.state.clone();
+            println!("STILL ONNNN");
+        }
+    }
+
+    fn power_off(&mut self) {
+        self.state = State::PoweredOff;
+    }
+
+    fn listen(&mut self) -> thread::JoinHandle<Vec<u8>> {
         let sock = self.set_socket();
+
+        let (tx, rx) = channel();
+
+        let mut b_in: Vec<u8> = vec![];
+
         let handle = thread::spawn(move || {
-            StubCloud::read_mssg(sock)
+            tx.send(b"Kik?^").unwrap();
+            tx.send(b"Live^").unwrap();
+            // b_in = StubCloud::read_mssg(sock);
+            // c = b_in.clone();
+            let mssg: Vec<u8> = StubCloud::read_mssg(sock);
+            // let mut c_mssg = mssg.clone();
+            // c_mssg.push(0);
+            // tx.send(c_mssg);
+            mssg
         });
         /*
          * Prevents possible race conditions while SubCloud sets up
          * a UDP socket to listen on
         */
         thread::sleep_ms(3000);
+
+        let mut all_mssgs: Vec<Vec<u8>> = vec![];
+        let mut mssg: Vec<u8> = vec![];
+        for b in rx.recv().unwrap() {
+            let b = b.clone();
+            match b {
+                94 => {
+                    all_mssgs.push(mssg);
+                    mssg = vec![];
+                },
+                _ => mssg.push(b),
+            }
+        }
+
+        all_mssgs.push(mssg);
+
+        self.bcast_mssgs = Some(
+            all_mssgs
+        );
+
         handle
     }
 
@@ -115,6 +164,7 @@ impl StubCloud {
 mod test {
     use super::*;
     use std::net::{SocketAddr, UdpSocket};
+    use state::*;
 
     #[test]
     fn test_port() {
@@ -123,31 +173,37 @@ mod test {
         let cloud = StubCloud {
             port: port,
             ip: ip,
+            bcast_mssgs: None,
+            state: State::PoweredOff,
         };
         assert_eq!(cloud.port, port);
     }
 
     #[test]
     fn test_ip() {
-        let port: u16 = 3131;
+        let port: u16 = 3132;
         let ip = "localhost".to_string();
         let cloud = StubCloud {
             port: port,
             ip: ip.clone(),
+            bcast_mssgs: None,
+            state: State::PoweredOff,
         };
         assert_eq!(cloud.ip, ip);
     }
 
     #[test]
     fn test_set_socket() {
-        let port: u16 = 3131;
+        let port: u16 = 3133;
         let ip = "localhost".to_string();
         let cloud = StubCloud {
             port: port,
             ip: ip.clone(),
+            bcast_mssgs: None,
+            state: State::PoweredOff,
         };
         let sock = cloud.set_socket();
-        let addr = sock.local_addr().uwnrap();
+        let addr = sock.local_addr().unwrap();
         assert_eq!(
             sock.local_addr().unwrap(),
             addr
@@ -156,11 +212,13 @@ mod test {
 
     #[test]
     fn test_listen() {
-        let port: u16 = 3131;
+        let port: u16 = 3134;
         let ip = "localhost".to_string();
-        let cloud = StubCloud {
+        let mut cloud = StubCloud {
             port: port,
             ip: ip.clone(),
+            bcast_mssgs: None,
+            state: State::PoweredOff,
         };
         let handle = cloud.listen();
 
@@ -168,11 +226,49 @@ mod test {
         match UdpSocket::bind("localhost:3000") {
             Ok(sock) => socket = sock,
             Err(e) => panic!("ERROR SOMWHERE: {}", e),
-        };
+        }
         let greets: &[u8] = b"Hello, world!";
-        socket.send_to(greets, "localhost:3131");
+        socket.send_to(greets, "localhost:3134");
 
         let recieved = handle.join().unwrap();
         assert_eq!(13, recieved.len());
+    }
+
+    #[test]
+    fn test_broadcast_save() {
+        let port: u16 = 3135;
+        let ip = "localhost".to_string();
+        let mut cloud = StubCloud {
+            port: port,
+            ip: ip.clone(),
+            bcast_mssgs: None,
+            state: State::PoweredOff,
+        };
+
+        cloud.power_on();
+
+        let mut sock;
+        match UdpSocket::bind("localhost:3000") {
+            Ok(socket) => sock = socket,
+            Err(e) => {
+                panic!("ERRORR SOMEWHERE: {}", e);
+            },
+        }
+
+        let disc_mssg1: &[u8] = b"My Device";
+        let disc_mssg2: &[u8] = b"Another Device";
+
+        sock.send_to(disc_mssg1, "localhost:3135");
+        sock.send_to(disc_mssg2, "localhost:3135");
+
+        let mut mssgs: Vec<Vec<u8>>;
+        match cloud.bcast_mssgs {
+            Some(ref b) => { mssgs = b.clone(); },
+            None => panic!("ITS NOT WORKING YETTi"),
+        };
+
+        cloud.power_off();
+
+        assert_eq!(2, mssgs.len())
     }
 }
