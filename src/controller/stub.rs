@@ -11,7 +11,6 @@ use state::*;
 
 use std::net;
 use std::thread;
-use std::sync::Arc;
 
 /*
  *
@@ -118,7 +117,7 @@ mod test {
     use std::net::{SocketAddr, UdpSocket};
 
     #[test]
-    fn test_address() {
+    fn test_port() {
         let port: u16 = 3131;
         let ip = "localhost".to_string();
         let cloud = StubCloud {
@@ -140,7 +139,7 @@ mod test {
     }
 
     #[test]
-    fn test_socket() {
+    fn test_set_socket() {
         let port: u16 = 3131;
         let ip = "localhost".to_string();
         let cloud = StubCloud {
@@ -148,15 +147,15 @@ mod test {
             ip: ip.clone(),
         };
         let sock = cloud.set_socket();
-        let addr = sock.local_addr();
+        let addr = sock.local_addr().uwnrap();
         assert_eq!(
             sock.local_addr().unwrap(),
-            addr.unwrap()
+            addr
         );
     }
 
     #[test]
-    fn test_udp() {
+    fn test_listen() {
         let port: u16 = 3131;
         let ip = "localhost".to_string();
         let cloud = StubCloud {
