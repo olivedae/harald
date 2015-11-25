@@ -1,3 +1,6 @@
+extern crate mio;
+extern crate bytes;
+
 pub mod controller;
 pub mod central;
 pub mod peripheral;
