@@ -26,8 +26,7 @@ script:
   - |
       travis-cargo build &&
       travis-cargo test &&
-      travis-cargo bench &&
-      travis-cargo --only stable doc
+      travis-cargo bench
 after_success:
   - travis-cargo coveralls --no-sudo --verify
 
