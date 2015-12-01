@@ -1,1 +1,1 @@
-pub struct PeripheralPeer;
+pub struct Central;

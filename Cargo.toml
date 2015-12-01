@@ -7,3 +7,7 @@ repository = "https://github.com/pyroar/bluetooth"
 license = "MIT"
 authors = ["Richard Protasov <richard.shlyakhov15@ncf.edu>"]
 keywords = ["bluetooth"]
+
+[dependencies]
+mio = "0.4"
+bytes = "0.2.11"
