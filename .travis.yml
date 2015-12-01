@@ -1,8 +1,10 @@
+sudo: false
 language: rust
 rust:
-  - stable
-  - beta
   - nightly
+  - beta
+  - stable
+  - 1.0.0
 
 matrix:
   allow_failures:
@@ -14,18 +16,24 @@ addons:
       - libcurl4-openssl-dev
       - libelf-dev
       - libdw-dev
+      - binutils-dev
 
-after_success: |
-    [ $TRAVIS_RUST_VERSION = stable ] &&
-    wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
-    tar xzf master.tar.gz && mkdir kcov-master/build && cd kcov-master/build && cmake .. && make && make install DESTDIR=../tmp && cd ../.. &&
-    ls target/debug &&
-    ./kcov-master/tmp/usr/local/bin/kcov --coveralls-id=$TRAVIS_JOB_ID --exclude-pattern=/.cargo target/kcov target/debug/bluetooth-* &&
-    [ $TRAVIS_BRANCH = master ] &&
-    [ $TRAVIS_PULL_REQUEST = false ] &&
-    [ $TRAVIS_RUST_VERSION = stable ] &&
-    cargo doc --no-deps &&
-    echo '<meta http-equiv=refresh content=0;url=hyper/index.html>' > target/doc/index.html &&
-    pip install --user ghp-import &&
-    /home/travis/.local/bin/ghp-import -n target/doc &&
-    git push -fq https://${TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages
+before_script:
+  - |
+      pip install 'travis-cargo<0.2' --user &&
+      export PATH=$HOME/.local/bin:$PATH
+
+script:
+  - |
+      travis-cargo build &&
+      travis-cargo test &&
+      travis-cargo bench &&
+      travis-cargo --only stable doc
+after_success:
+  - travis-cargo --only stable doc-upload
+  - travis-cargo coveralls --no-sudo --verify
+
+env:
+  global:
+    - TRAVIS_CARGO_NIGHTLY_FEATURE=nightly
+    - secure: "u81Bc9aAqav0ZOeSrE01G1nIkYVePHnfFnI/qQ08WKBeKCTO9fJUgIbrS/793E0MH7USbDpLrnh+dzPU2nLYiRoPJPKcaB3iJJKaLeh8r4DkR0Js4x3VOMAy/HVdHRDad4+CrQg4oVUNHLGnJDYi4g6u+blnlO8oDEJelRscl1RulwclonchAlMqdhoX+mATavFhaaDHOgkjSJIib/NcBXLkn7E7oGl9SvJNwrnQyYwLY1/d1NicqqI+OIMthkUCEM8wY2pXg7BWUQcCJZGPKd3wuQ50J+E12YXlAJQK8c5W02K8fvI8Nzua3btxQIVlnwcbSuO56sOGv2ZufaVRzvjatshVLDuewt86F+Jv/Eyem4GBoD2lgTi3EHGcirWdxaCUuUBvz+W6h6GR6fsECyM/fwr52Do7sa52htianZARKJ9vto9QcsBunCiBP9YCQobQQcluxBaB7X7wm/+TCjoCLvEO92+eg7g1hRh6WxJBdUaQyTCaJFVx2vnvs9T0wpM2+g+jutj74ioCxk8we5BJrPcfuGrOCEcd3OKhgXsT8HpY1Mgt9wdKcsNRzDBaH7/oFN+j+U9/Ym3R5qSywUA9hs7S69Xv2YFI1QoVzE/lHerNufYd0ziVygHrHFaDLP6xGNan2Y2DoqXDfuV5PO77aFG49rMAY85StOvqKQY="
