@@ -4,7 +4,6 @@ rust:
   - nightly
   - beta
   - stable
-  - 1.0.0
 
 matrix:
   allow_failures:
@@ -35,5 +34,4 @@ after_success:
 
 env:
   global:
-    - TRAVIS_CARGO_NIGHTLY_FEATURE=nightly
     - secure: "u81Bc9aAqav0ZOeSrE01G1nIkYVePHnfFnI/qQ08WKBeKCTO9fJUgIbrS/793E0MH7USbDpLrnh+dzPU2nLYiRoPJPKcaB3iJJKaLeh8r4DkR0Js4x3VOMAy/HVdHRDad4+CrQg4oVUNHLGnJDYi4g6u+blnlO8oDEJelRscl1RulwclonchAlMqdhoX+mATavFhaaDHOgkjSJIib/NcBXLkn7E7oGl9SvJNwrnQyYwLY1/d1NicqqI+OIMthkUCEM8wY2pXg7BWUQcCJZGPKd3wuQ50J+E12YXlAJQK8c5W02K8fvI8Nzua3btxQIVlnwcbSuO56sOGv2ZufaVRzvjatshVLDuewt86F+Jv/Eyem4GBoD2lgTi3EHGcirWdxaCUuUBvz+W6h6GR6fsECyM/fwr52Do7sa52htianZARKJ9vto9QcsBunCiBP9YCQobQQcluxBaB7X7wm/+TCjoCLvEO92+eg7g1hRh6WxJBdUaQyTCaJFVx2vnvs9T0wpM2+g+jutj74ioCxk8we5BJrPcfuGrOCEcd3OKhgXsT8HpY1Mgt9wdKcsNRzDBaH7/oFN+j+U9/Ym3R5qSywUA9hs7S69Xv2YFI1QoVzE/lHerNufYd0ziVygHrHFaDLP6xGNan2Y2DoqXDfuV5PO77aFG49rMAY85StOvqKQY="
