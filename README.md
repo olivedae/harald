@@ -1,4 +1,4 @@
-# Bluetooth.rs
+# Blue
 
 [![Travis Build Status](https://travis-ci.org/pyroar/bluetooth.svg?branch=master)](https://travis-ci.org/pyroar/bluetooth)
 [![Coverage Status](https://coveralls.io/repos/pyroar/bluetooth/badge.svg?branch=master&service=github)](https://coveralls.io/github/pyroar/bluetooth?branch=master)
