@@ -1,6 +1,4 @@
-use controller::identifiers::ChannelID;
 use controller::data::HasData;
-use controller::command::Command;
 
 /*
  *
@@ -17,17 +15,18 @@ use controller::command::Command;
 pub struct ChannelPDU {
     pub length: u16,
     pub id: u16,
-    pub information: u64,
+    pub information: Vec<u8>,
 }
 
 pub struct ChannelCommand;
 
 impl ChannelPDU {
-    pub fn new<D: HasData>(id: ChannelID, payload: D) -> ChannelPDU {
+    pub fn new<D: HasData>(id: u16, payload: D) -> ChannelPDU {
+        let information = payload.encode();
         ChannelPDU {
-            id: id.to_u16(),
-            length: payload.size(),
-            information: payload.encode(),
+            length: information.size(),
+            id: id,
+            information: information,
         }
     }
 
