@@ -8,6 +8,5 @@ license = "MIT"
 authors = ["Richard Protasov <richard.shlyakhov15@ncf.edu>"]
 keywords = ["bluetooth"]
 
-[dependencies]
-mio = "0.4"
-bytes = "0.2.11"
+[dependencies.bytes]
+git = "https://github.com/carllerche/bytes"
