@@ -1,16 +1,10 @@
 use state::*;
 use central::peer::*;
+use uuid::*;
 
+#[derive(Clone)]
 pub struct CentralManager {
     state: State,
-    /*
-     * Currently, found_peripherals consists of a
-     * naive option type vector of Peripheral.
-     *
-     * Ideally it will use a Binary Search Tree (E.G. BSTMap)
-     * which is currently under development. Allowing for
-     * faster updates and tracking.
-    */
     periphs: Vec<Option<Peripheral>>,
     scan: bool,
 }
@@ -28,25 +22,39 @@ impl CentralManager {
         self.state.clone()
     }
 
-    pub fn scan(&mut self) {
-
+    pub fn scan(&mut self) -> Option<Vec<Peripheral>> {
+        let count: usize;
+        match self.periphs.len() {
+            1 => return None,
+            _ => count = self.periphs.len() - 1,
+        }
+        let mut periphs: Vec<Peripheral> = Vec::with_capacity(count);
+        for p in self.periphs.clone() {
+            match p {
+                Some(peripheral) => periphs.push(peripheral),
+                None => continue,
+            }
+        }
+        self.periphs = vec![None];
+        Some(periphs)
     }
 
     pub fn stop_scan(&mut self) {
         self.scan = false;
     }
 
-    pub fn found_peripherals(&self) -> Option<Vec<Peripheral>> {
-        None
+    pub fn recieve(&mut self, pdu: &[u8]) {
+        let a_uuid = UUID::Custom(0x1234);
+        let a_peripheral = Peripheral::new(a_uuid);
+        self.periphs.push(Some(a_peripheral));
     }
 }
 
 #[cfg(test)]
-mod tests {
+mod test_manager {
     use super::*;
     use state::*;
-    use central::peer::*;
-    use uuid::*;
+    use gap::broadcast::*;
 
     #[test]
     fn test_new() {
@@ -57,27 +65,31 @@ mod tests {
     #[test]
     fn test_empty_scan() {
         let mut manager = CentralManager::new();
-        manager.scan();
-        assert_eq!(manager.found_peripherals(), None);
+        let peripherals = manager.scan();
+        assert_eq!(peripherals, None);
     }
 
     #[test]
     fn test_starting_manager() {
         let mut manager = CentralManager::new();
-        manager.scan();
+        let _ = manager.scan();
         assert_eq!(manager.state, State::PoweredOn);
     }
 
+    /*
+     * Not so much of a unit test but an integration test
+     * since it involves various portions of the library to function.
+     *
+     * Allows for a starting point to creating the client interface and from
+     * there model logic.
+    */
     #[test]
-    fn test_scan_with_peripherals() {
-        let mut manager = CentralManager::new();
-
-        /*
-         * TODO:
-         *
-         * Example of the Stub struct can included
-         * peripherals on the other end (in addition to how
-         * CentralManger and other strucutes interact with it)
-        */
+    fn test_understanding_advertisements() {
+        let mut central = CentralManager::new();
+        let adv_pdu = Broadcast::advertisement_format();
+        central.recieve(adv_pdu);
+        let peripherals = central.scan();
+        let peripheral = peripherals.unwrap()[0].clone();
+        assert_eq!(peripheral.name(), "Example Name".to_string());
     }
 }

@@ -2,9 +2,10 @@ use std::fmt::{Debug, Formatter, Result};
 use uuid::*;
 use service::*;
 
+#[derive(Clone)]
 pub struct Peripheral {
-    services: Option<Vec<Service>>,
     uuid: UUID,
+    services: Option<Vec<Service>>,
 }
 
 impl Peripheral {
@@ -13,6 +14,10 @@ impl Peripheral {
             uuid: uuid,
             services: None,
         }
+    }
+
+    pub fn name(&self) -> String {
+        "Example Name".to_string()
     }
 }
 
