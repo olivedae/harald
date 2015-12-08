@@ -24,7 +24,6 @@ pub enum Service {
     ScanParameters,
     TXPower,
     AutomationIO,
-    BatteryService,
     NetworkAvailablity,
     Unknown(UUID)
 }
@@ -55,9 +54,8 @@ impl Service {
             Service::ScanParameters => 0x1813,
             Service::TXPower => 0x1804,
             Service::AutomationIO => 0x1815,
-            Service::BatteryService => 0x180f,
             Service::NetworkAvailablity => 0x180b,
-            Service::Unknown(ref uuid) => *uuid.to_hex(),
+            Service::Unknown(ref uuid) => uuid.to_hex(),
         })
     }
 
@@ -87,7 +85,7 @@ impl Service {
             0x1804 => Service::TXPower,
             0x1815 => Service::AutomationIO,
             0x180b => Service::NetworkAvailablity,
-            _ => Service::Undefined(uuid),
+            _ => Service::Unknown(uuid),
         }
     }
 
@@ -117,7 +115,7 @@ impl Service {
             Service::TXPower => "TX Power",
             Service::AutomationIO => "Automation IO",
             Service::NetworkAvailablity => "Network Availability Service",
-            Service::Undefined => "Undefined",
+            Service::Unknown(ref _uuid) => "Unknown",
         }
     }
 }
