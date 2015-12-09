@@ -2,7 +2,7 @@ use std::fmt::{Debug, Formatter, Result};
 
 #[derive(Clone)]
 pub enum UUID {
-    Custom(u32),
+    Custom(u16),
 }
 
 impl UUID {
@@ -18,7 +18,7 @@ impl UUID {
         return UUID::Custom(0xff)
     }
 
-    pub fn to_hex(&self) -> u32 {
+    pub fn to_hex(&self) -> u16 {
         match *self { UUID::Custom(ref hex) => *hex, }
     }
 }
