@@ -24,60 +24,78 @@ impl Attribute {
         }
     }
 
-    pub fn expand(incoming_pdu: Vec<u8>) -> Attribute {
-        Attribute::new(
-            0x0001, UUID::Custom(0x00ff), String::from("Example Data").into_bytes()
-        )
+    pub fn expand(incoming: Vec<u8>) -> Attribute {
+        let mut bytes = incoming.clone();
+        bytes.reverse();
+        let mut pdu: Vec<String> = Vec::with_capacity(4);
+        for _ in 0..4 {
+            pdu.push(
+                match bytes.pop() {
+                    Some(byte) => format!("{:x}", byte).to_string(),
+                    _ => panic!("Error!"),
+                }
+            );
+        }
+        let h: String = pdu[0..1].join("");
+        let t: String = pdu[2..3].join("");
+        bytes.reverse();
+        Attribute {
+            handle: h.parse::<u16>().unwrap(),
+            the_type: UUID::Custom(
+                t.parse::<u16>().unwrap()
+            ),
+            value: bytes,
+        }
     }
 
     pub fn to_bytes(self) -> Vec<u8> {
-        let handle = self.handle as *const u8;
-        let a_type = self.the_type.to_hex() as *const u8;
-        let raw_handle: &[u8] = unsafe {
-            slice::from_raw_parts(
-                handle,
-                mem::size_of::<u8>(),
-            )
-        };
-        let a_raw_type: &[u8] = unsafe {
-            slice::from_raw_parts(
-                a_type,
-                mem::size_of::<u8>(),
-            )
-        };
-        let mut raw_pdu: Vec<u8> = Vec::with_capacity(MTU);
-        // for b in self.to_vec(raw_handle) {
-        //     raw_pdu.push(b);
-        //     println!("{:?}", b);
-        // }
-        // for b in self.to_vec(a_raw_type) {
-        //     // raw_pdu.push(b);
-        //     println!("{:?}", b);
-        // }
-        for b in self.value {
-            raw_pdu.push(b);
-        }
-        raw_pdu
+        let h: *const u16 = &self.handle;
+        let bh: *const u8 = h as *const _;
+        let t: *const u16 = &self.the_type.to_hex();
+        let bt: *const u8 = t as *const _;
+        let mut raw_handle = Attribute::to_vec(
+            unsafe {
+                slice::from_raw_parts(
+                    bh,
+                    mem::size_of::<u16>()
+                )
+            }
+        );
+        let mut a_raw_type = Attribute::to_vec(
+            unsafe {
+                slice::from_raw_parts(
+                    bt,
+                    mem::size_of::<u16>(),
+                )
+            }
+        );
+        let mut raw_value = self.value.clone();
+
+        let mut buf = Vec::with_capacity(MTU);
+
+        buf.append(&mut raw_handle);
+        buf.append(&mut a_raw_type);
+        buf.append(&mut raw_value);
+        buf
     }
 
-    fn to_vec(&self, arr: &[u8]) -> Vec<u8> {
+    fn to_vec(arr: &[u8]) -> Vec<u8> {
         arr.iter().cloned().collect()
     }
 }
 
 #[cfg(test)]
-mod test_attribute {
+mod tests {
     use super::*;
     use uuid::*;
-    use bytes::*;
 
     #[test]
     fn test_new_attribute() {
         let pdu = Attribute::new(
-            0x0001, UUID::Custom(0x00ff), String::from("Example Data").into_bytes()
+            0x0001, UUID::Custom(0x0002), String::from("Example Data").into_bytes()
         );
         assert_eq!(pdu.handle, 0x0001);
-        assert_eq!(pdu.the_type, UUID::Custom(0x00ff));
+        assert_eq!(pdu.the_type, UUID::Custom(0x0002));
         assert_eq!(pdu.value, String::from("Example Data").into_bytes());
     }
 
@@ -85,18 +103,27 @@ mod test_attribute {
     #[should_panic]
     fn test_reserved_handle() {
         let pdu = Attribute::new(
-            0x0000, UUID::Custom(0x00ff), String::from("Example Data").into_bytes()
+            0x0000, UUID::Custom(0x0001), String::from("Example Data").into_bytes()
         );
+    }
+
+    #[test]
+    fn test_to_bytes() {
+        let pdu = Attribute::new(
+            0x0002, UUID::Custom(0x1234), String::from("Test").into_bytes()
+        );
+        let b = pdu.to_bytes();
+        assert_eq!(b, [2, 0, 52, 18, 84, 101, 115, 116])
     }
 
     #[test]
     fn test_expanding() {
         let mut pdu = Attribute::new(
-            0x0001, UUID::Custom(0x00ff), String::from("Example Data").into_bytes()
+            0x0001, UUID::Custom(0x0002), String::from("Example Data").into_bytes()
         ).to_bytes();
         let recieve = Attribute::expand(pdu);
         assert_eq!(recieve.handle, 0x0001);
-        assert_eq!(recieve.the_type, UUID::Custom(0x00ff));
+        assert_eq!(recieve.the_type, UUID::Custom(0x0002));
         assert_eq!(recieve.value, String::from("Example Data").into_bytes());
     }
 }
