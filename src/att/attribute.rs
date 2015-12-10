@@ -2,7 +2,7 @@ use uuid::*;
 use bytes::*;
 use std::{slice,mem};
 
-const MTU: usize = 23;
+const ATT_MTU: usize = 23;
 
 pub struct Attribute {
     handle: u16,
@@ -71,7 +71,7 @@ impl Attribute {
         );
         let mut raw_value = self.value.clone();
 
-        let mut buf = Vec::with_capacity(MTU);
+        let mut buf = Vec::with_capacity(ATT_MTU);
 
         buf.append(&mut raw_handle);
         buf.append(&mut a_raw_type);
