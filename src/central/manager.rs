@@ -1,32 +1,18 @@
 use state::*;
-use controller::hci::*;
 use central::peer::*;
-use std::sync::mpsc::channel;
-use std::thread;
-use controller::stream::*;
+use uuid::*;
 
-pub struct CentralManager<'stream> {
+#[derive(Clone)]
+pub struct CentralManager {
     state: State,
-    hci: HCI,
-    stream: &'stream (L2CAPStream + 'stream),
-    /*
-     * Currently, found_peripherals consists of a
-     * naive option type vector of Peripheral.
-     *
-     * Ideally it will use a Binary Search Tree (E.G. BSTMap)
-     * which is currently under development. Allowing for
-     * faster updates and tracking.
-    */
     periphs: Vec<Option<Peripheral>>,
     scan: bool,
 }
 
-impl<'stream> CentralManager<'stream> {
-    pub fn new(hci: HCI, stream: &'stream L2CAPStream) -> CentralManager<'stream> {
+impl CentralManager {
+    pub fn new() -> CentralManager {
         CentralManager {
-            state: stream.le_status(),
-            hci: hci,
-            stream: stream,
+            state: State::PoweredOn,
             periphs: vec![None],
             scan: false,
         }
@@ -36,82 +22,74 @@ impl<'stream> CentralManager<'stream> {
         self.state.clone()
     }
 
-    pub fn scan(&mut self) {
-        match self.state {
-            State::PoweredOn => self.scan = true,
-            State::PoweredOff => panic!("Turn on Bluetooth and try again."),
-            _ => panic!("Bluetooth status is {:?}", self.state)
+    pub fn scan(&mut self) -> Option<Vec<Peripheral>> {
+        let count: usize;
+        match self.periphs.len() {
+            1 => return None,
+            _ => count = self.periphs.len() - 1,
         }
-
-        let (sx, rx) = channel::<Peripheral>();
-
-        let scanning = thread::spawn(move || {
-            // while self.scan {
-            //     self.stream.open(|p| sx.send(p).unwrap() );
-            // }
-            // self.scan
-        });
-
-        //
-        // rx.recv();
+        let mut periphs: Vec<Peripheral> = Vec::with_capacity(count);
+        for p in self.periphs.clone() {
+            match p {
+                Some(peripheral) => periphs.push(peripheral),
+                None => continue,
+            }
+        }
+        self.periphs = vec![None];
+        Some(periphs)
     }
 
     pub fn stop_scan(&mut self) {
         self.scan = false;
     }
 
-    pub fn found_peripherals(&self) -> Option<Vec<Peripheral>> {
-        None
+    pub fn recieve(&mut self, pdu: &[u8]) {
+        let a_uuid = UUID::Custom(0x1234);
+        let a_peripheral = Peripheral::new(a_uuid);
+        self.periphs.push(Some(a_peripheral));
     }
 }
 
 #[cfg(test)]
-mod tests {
-    use super::CentralManager;
+mod test_manager {
+    use super::*;
     use state::*;
-    use central::peer::*;
-    use uuid::*;
-    use controller::hci::*;
-    use controller::stub::*;
+    use gap::broadcast::*;
 
     #[test]
     fn test_new() {
-        let stub_stream = StubStream::new();
-        let mut manager = CentralManager::new(HCI::Stub, &stub_stream);
+        let mut manager = CentralManager::new();
         assert_eq!(manager.state(), State::PoweredOn);
     }
 
     #[test]
     fn test_empty_scan() {
-        let stub_stream = StubStream::new();
-        let mut manager = CentralManager::new(HCI::Stub, &stub_stream);
-        manager.scan();
-        assert_eq!(manager.found_peripherals(), None);
-        manager.stop_scan();
+        let mut manager = CentralManager::new();
+        let peripherals = manager.scan();
+        assert_eq!(peripherals, None);
     }
 
     #[test]
     fn test_starting_manager() {
-        let stub_stream = StubStream::new();
-        let mut manager = CentralManager::new(HCI::Stub, &stub_stream);
-        manager.scan();
+        let mut manager = CentralManager::new();
+        let _ = manager.scan();
         assert_eq!(manager.state, State::PoweredOn);
-        manager.stop_scan();
     }
 
+    /*
+     * Not so much of a unit test but an integration test
+     * since it involves various portions of the library to function.
+     *
+     * Allows for a starting point to creating the client interface and from
+     * there model logic.
+    */
     #[test]
-    fn test_scan_with_peripherals() {
-        let mut stub_stream = StubStream::new();
-        let mut manager = CentralManager::new(HCI::Stub, &stub_stream);
-        let a_uuid = UUID::as_hex("3a4f");
-        let a_peripheral = Peripheral::new(a_uuid);
-
-        /*
-         * TODO:
-         *
-         * Example of the Stub struct can included
-         * peripherals on the other end (in addition to how
-         * CentralManger and other strucutes interact with it)
-        */
+    fn test_understanding_advertisements() {
+        let mut central = CentralManager::new();
+        let adv_pdu = Broadcast::advertisement_format();
+        central.recieve(adv_pdu);
+        let peripherals = central.scan();
+        let peripheral = peripherals.unwrap()[0].clone();
+        assert_eq!(peripheral.name(), "Example Name".to_string());
     }
 }

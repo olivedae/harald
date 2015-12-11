@@ -1,11 +1,12 @@
 use std::fmt::{Debug, Formatter, Result};
 
+#[derive(Clone)]
 pub enum UUID {
-    Custom(u32),
+    Custom(u16),
 }
 
 impl UUID {
-    pub fn as_hex(hex_string: &'static str) -> UUID {
+    pub fn as_hex(_hex_string: &'static str) -> UUID {
         /*
          * Users can enter a hexadeciaml
          * strings and will convert the given value
@@ -17,7 +18,7 @@ impl UUID {
         return UUID::Custom(0xff)
     }
 
-    pub fn to_hex(&self) -> u32 {
+    pub fn to_hex(&self) -> u16 {
         match *self { UUID::Custom(ref hex) => *hex, }
     }
 }

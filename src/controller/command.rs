@@ -32,12 +32,8 @@ pub enum CommandRejectReason {
 }
 
 impl HasData for Command {
-    fn encode(&self) -> u64 {
-        42u64
-    }
-
-    fn size(&self) -> u16 {
-        42u16
+    fn encode(&self) -> Vec<u8> {
+        vec![15, 7]
     }
 }
 

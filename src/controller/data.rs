@@ -1,4 +1,3 @@
 pub trait HasData {
-    fn encode(&self) -> u64;
-    fn size(&self) -> u16;
+    fn encode(&self) -> Vec<u8>;
 }
