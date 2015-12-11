@@ -3,7 +3,6 @@ use std::clone::Clone;
 
 pub enum State {
     Unknown,
-    Resetting,
     Unsupported,
     Unauthorized,
     PoweredOff,
@@ -14,7 +13,6 @@ impl State {
     fn id(&self) -> usize {
         match *self {
             State::Unknown      => 1,
-            State::Resetting    => 2,
             State::Unsupported  => 3,
             State::Unauthorized => 4,
             State::PoweredOff   => 5,
@@ -33,7 +31,6 @@ impl Debug for State {
     fn fmt(&self, f: &mut Formatter) -> Result {
         write!(f, "State::{}", match *self {
             State::Unknown      => "Unknown",
-            State::Resetting    => "Resetting",
             State::Unsupported  => "Unsupported",
             State::Unauthorized => "Unauthorized",
             State::PoweredOff   => "PoweredOff",
@@ -46,7 +43,6 @@ impl Clone for State {
     fn clone(&self) -> State {
         match *self {
             State::Unknown      => State::Unknown,
-            State::Resetting    => State::Resetting,
             State::Unsupported  => State::Unsupported,
             State::Unauthorized => State::Unauthorized,
             State::PoweredOff   => State::PoweredOff,
