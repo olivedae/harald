@@ -1,11 +1,35 @@
+/*
+ * Demo of a simple Heart Rate Monitor application
+ * written in Rust and using the Bluetooth crate. The
+ * application simply establishes a connection with a peripheral
+ * device which supports the Heart Rate Service and periodically
+ * reconnects to update the text display of a user's
+ * heart rate.
+ *
+ * One fact to point out is that this file is
+ * currently unable to run due to Bluetooth
+ * library being incomplete. It however does
+ * serve as a projected view of interaction
+ * with this library.
+*/
+
 extern crate piston_window;
 extern crate bluetooth;
 extern crate chrono;
 extern crate find_folder;
 extern crate rand;
 
-use blue::{central, peripheral, gatt};
-use blue::uuid::*;
+/*
+ * To begin, we load in required libraries and bring
+ * into scope various features such as Bluetooth's
+ * abstracted structures of CentralManager, PeripheralManager,
+ * and a library to identify the services and characteristics
+ * supported by a Device (commonly devices which perform as a server, thus
+ * a peripheral).
+*/
+
+use bluetooth::{central, peripheral, gatt};
+use bluetooth::uuid::*;
 use piston_window::*;
 use chrono::*;
 use rand::Rng;
@@ -17,6 +41,18 @@ const HEART_BEAT_HANDLE: u16 = 0x0001;
 
 const MIN_HEART_BEAT: u16: = 115;
 
+/*
+ * Currently, Bluetooth does not support
+ * interactions with an OS's Bluetooth LE controller.
+ *
+ * I initialize and PeripheralManager to mimic
+ * the manager in charge of our to be found heart
+ * rate device. We define it as static to
+ * allow our application access to it without
+ * having to pass in is as arguments, thus
+ * hiding this fact in a beneficial manner.
+*/
+
 static mut hrd_manager:
     peripheral::manager::PeripheralManager = peripheral::manager::PeripheralManager::new();
 
@@ -27,6 +63,14 @@ let hr = some_heart_rate();
 unsafe {
     hrd_manager.set(HEART_BEAT_HANDLE, hr);
 }
+
+/*
+ * I define several functions designed
+ * periodically update the peripheral device
+ * with new heart rate data, thus allowing
+ * an example as how to one can manage the external
+ * state of a value.
+*/
 
 fn some_heart_rate() -> u16
 {
@@ -51,12 +95,45 @@ fn update_hrd()
     }
 }
 
+/*
+ * I create the `HeartRateMoniter` structure to
+ * represent a heart rate monitor app which runs
+ * over Bluetooth Low Energy and implements my
+ * my library.
+*/
+
 struct HeartRateMoniter
 {
+    /*
+     * Several access variables to be used
+     * internally such as clock (controls when
+     * the application reconnects) and variables
+     * to be used externally such as `heart_rate`
+     * and `connected`.
+    */
     connected: bool,
     heart_rate: u16,
     clock: DateTime<Local>,
+    /*
+     * Initializes a generic client to be
+     * used by the application.
+    */
     manager: central::manager::CentralManager,
+    /*
+     * Stores an abstracted data structure
+     * used to represent an external peripheral
+     * found by the client manager. At the heart,
+     * devices can be found by located by
+     * their address UUID. A `PeripheralPeer`
+     * abstracts this in addition to building a
+     * server that stores previously located attributes and
+     * supported profiles and characteristics.
+     *
+     * Ideally it will also allow for an application
+     * to recieve/queue received
+     * notifications and indications for this
+     * peer.
+    */
     peripheral: Option<central::peer::Peripheral>,
 }
 
@@ -78,28 +155,162 @@ impl HeartRateMoniter
         }
     }
 
+    /*
+     * Indicates to the application to
+     * begin scanning and locate a device which
+     * supports the Heart Rate service, defined by
+     * the Bluetooth SIG.
+    */
     pub fn start_scan(&mut self)
     {
+        /*
+         * Queries the controller of the machine
+         * running the application whether it supports
+         * Bluetooth Low Energy.
+        */
         if self.is_le_capable_hardware()
         {
             let peripheral: central::peer::Peripheral;
 
             let adv: &[u8];
 
+            /*
+             * Since queries to machine's controller are
+             * currently unsupported we generate an advertisement
+             * packet directly by the peer manager following the
+             * Generic Access Profile (GAP).
+             *
+             * Our slave device takes the peripheral and
+             * broadcaster role define by GAP and thus
+             * emits advertisements and responds to requests
+             * (such a bonding, active scanning) made by a
+             * central device.
+             *
+             * Emitted advertisement packets contain
+             * flags to inform a device scanning about
+             * the state of the advertisement in addition to
+             * the state of the broadcaster. A short list of
+             * defined modes include broadcast, (non, limited)discoverable,
+             * and (non)bondable.
+             *
+             * These can then be translated to various procedures
+             * for both central and peripheral devices to follow.
+             *
+             * Discovery:
+             * Refers to how devices are to be displayed
+             * by a user interface. Non-disoverable is self explanatory,
+             * however, confusion comes between limited and general. The
+             * limited discovery flag is sent for devices who have
+             * just turned on and want to be connected to and
+             * sends out advertisements a reasonable interval. This
+             * allows for a device to be fairly certain this
+             * is the device it is to be connected with. Limited
+             * discovery lasts for short period of time, somewhere between
+             * 250 - 500 milliseconds.
+             *
+             * General discovery mode is entered after limited and is
+             * similar to limited except it can be in this mode for
+             * an unlimited amount of time, in addition has a
+             * longer advertising interval.
+             *
+             * Allows for devices to make intelligent decisions on
+             * the order of available devices to connect with.
+             *
+             * Bonding:
+             * Typically devices bond when they wish
+             * to transmit encrypted data to one another
+             * wish to preform additional
+             * security procedures.
+            */
             unsafe { adv = hrd_manager.advertise(); }
 
+            /*
+             * Again, we avoid Bluetooth's transport
+             * layer and layers below that by directly passing
+             * data to devices. Ideally this will represent
+             * the interface that a manager structure receives information
+             * from its controller.
+             *
+             * When a `CentralManager` receives an advertisement
+             * it parses the PDU and moves relevant data and state
+             * to a developer-friendly `PeripheralPeer` structure
+             * and stores it for later use.
+            */
             self.manager.recieve(adv)
 
+            /*
+             * We then instruct the manager to
+             * scan for peripherals specifying
+             * an option for a supported service
+             * we are looking
+             * (since rarely do we want any
+             * Bluetooth device near us). This is
+             * supported by GATT structures
+             * which allows us to discover
+             * attributes, supported services,
+             * and various characteristics in an organized
+             * manner. This becomes handy for parsing and
+             * interaction between two devices that
+             * involves each others' state.
+             *
+             * It also exposes developer-friendly names
+             * for various services, characteristics, and
+             * descriptions defined by the Bluetooth SIG
+             * as opposed to raw 16 bit or 128 bit values.
+             *
+             * In this scenario we are looking for peripherals
+             * that support the HeartRate service and pass that
+             * as an argument to the function. We receive
+             * a vector of found peripherals wrapped in
+             * the Option<> structure since there may be
+             * no peers located.
+             *
+             * Returned peripherals contain
+             * only information provided by
+             * the information contained in a devices
+             * advertisement data. This varies and depends
+             * on what the device wants to send.
+             * This can include attributes such as
+             * a user-friendly name for
+             * the device and the transmit power
+             * and more abstract information
+             * such as several of the
+             * significant services the device supports
+             * and wants to make known of.
+             *
+             * Returned peripherals are in the order
+             * of relative closeness to a scanner
+             * where the first element is the closest
+             * and last is the furthest.
+            */
             peripherals = self.manager.scan_for_peripherals(
                 gatt::Service::HeartRate.to_uuid()
             );
 
+            /*
+             * Although we known our manager has
+             * received at one valid
+             * advertisement we check for
+             * at least one peer being found.
+            */
             if peripherals.len() >= 1
             {
                 let peripheral = peripherals[0];
 
-                self.manager.connect(peripheral);
+                /*
+                 * Using the selected peripheral I
+                 * instruct the manager to bond
+                 * with it.
+                 *
+                 * Go into what happens during bonding here.
+                */
+                self.manager.bond(peripheral);
 
+                /*
+                 * We then update our structures
+                 * fields appropriately
+                */
+                self.connected = true;
                 self.peripheral = Some(peripheral);
             }
         }
@@ -110,17 +321,44 @@ impl HeartRateMoniter
         self.manager.stop_scan();
     }
 
+    /*
+     * Since the application
+     * is fairly simple (only an updating text
+     * display), we return this
+     * value when requested.
+    */
     pub fn render(&self) -> String
     {
         self.heart_rate.to_string()
     }
 
+    /*
+     * The implementation of
+     * this application and graphic package
+     * used involves an event loop
+     * which continually iterates until
+     * it escapes (whether on close or an unresolvable error
+     * arises which causes it to panic).
+    */
     pub fn update(&mut self)
     {
         let now = Local::now();
 
+        /*
+         * Since we don't want our
+         * app to continually request to
+         * connect with the peripheral (will use
+         * fairly significant amount of resources)
+         * we create a connection gap of 5 seconds.
+        */
         if self.will_re_connect(&now)
         {
+            /*
+             * Updates the time since the last
+             * reconnection in addition to updating
+             * itself to the current state of
+             * the peer device.
+            */
             self.update_with_hrm_data();
             self.clock = now;
         }
@@ -142,6 +380,23 @@ impl HeartRateMoniter
         self.heart_rate = bpm;
     }
 
+    /*
+     * Example of a developer may interact with the
+     * library by first determining whether
+     * the machine running the application
+     * is capable of Bluetooth Low Energy
+     * communications.
+     *
+     * Currently, will always return true; however,
+     * calls go down to the controller and is requested
+     * from the device's link manager.
+     *
+     * If something isn't correct we'll print to the
+     * terminal a message saying what's going on.
+     * From here, developers may prompt the user to
+     * turn Bluetooth on or inform them that
+     * they are unable to use it and why and return false.
+    */
     fn is_le_capable_hardware(&self) -> bool
     {
         let state: String;
@@ -169,13 +424,19 @@ impl HeartRateMoniter
         false
     }
 
+    /*
+     * Not necessarily to be used for when the application
+     * is to be turned closed since
+     * Rust will allow for graceful deallocation
+     * of structures once a variable goes out of scope.
+     *
+     * Allows for a type of reset of the application.
+    */
     pub fn terminate(self)
     {
         self.stop_scan();
 
-        self.manager.cancel_connection(self.peripheral);
-
-        self.manager.release();
+        self.manager.cancel_bond(self.peripheral);
     }
 }
 
@@ -203,6 +464,7 @@ fn main()
     let mut glyphs = Glyphs::new(font, factory).unwrap();
 
     hrm.start_scan();
+    hrm.stop_scan();
 
     for e in window
     {
