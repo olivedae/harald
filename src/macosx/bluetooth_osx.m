@@ -1,7 +1,4 @@
-#import <util.h>
-#import <unistd.h>
-#import <Foundation/NSDictionary.h>
-#import <IOBluetooth/IOBluetoothUserLib.h>
+#import <Foundation/Foundation.h>
 #import <IOBluetooth/objc/IOBluetoothDevice.h>
 #import <IOBluetooth/objc/IOBluetoothDeviceInquiry.h>
 #import "bluetooth_osx.h"
@@ -10,8 +7,8 @@ NSArray *bluetooth_scan(void)
 {
     Scanner *scan = [Scanner new];
     [scan startSearch];
-        while ([scan isBusy])
-            ;
+    [NSThread sleepForTimeInterval:SCAN_INTERVAL];
+    [scan stopSearch];
     return [scan getFoundDevices];
 }
 
@@ -53,13 +50,22 @@ NSArray *bluetooth_scan(void)
     [foundDevices addObject:foundDevice];
 }
 
+-(void) deviceInquiryStarted:(IOBluetoothDeviceInquiry *)sender
+{
+    NSLog(@"STARTED");
+}
+
 -(IOReturn) startSearch
 {
     IOReturn status;
 
+    foundDevices = [NSMutableArray new];
+
     [self stopSearch];
 
     inquiry = [IOBluetoothDeviceInquiry inquiryWithDelegate:self];
+
+    [inquiry setSearchType:kIOBluetoothDeviceSearchLE];
 
     status = [inquiry start];
 

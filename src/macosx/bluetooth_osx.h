@@ -1,6 +1,8 @@
 #ifndef bluetooth_osx_h
 #define bluetooth_osx_h
 
+#define SCAN_INTERVAL 10.0
+
 NSArray * bluetooth_scan(void);
 
 @class IOBluetoothDeviceInquiry;
