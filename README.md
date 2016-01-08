@@ -1,9 +1,21 @@
-# Blue
+<p align="center">
+  <img src="https://d13yacurqjgara.cloudfront.net/users/666205/screenshots/1758164/rune.jpg">
+</p>
+<p align="center">
+  <a href="https://travis-ci.org/pyroar/bluetooth">
+    <img src="https://img.shields.io/travis/rust-lang/rust.svg?style=flat-square", alt="Build Status">
+  </a>
+  <a href="https://crates.io/crates/bluetooth">
+    <img src="http://meritbadge.herokuapp.com/bluetooth)", alt="crates.io">
+  </a>
+  <a href="https://coveralls.io/github/pyroar/bluetooth?branch=master">
+    <img src="https://coveralls.io/repos/pyroar/bluetooth/badge.svg?branch=master&service=github", alt="Coverage Status">
+  </a>
+  <br>
+  <strong><a href="http://rune.github.io/">Documentation</a> | <a href="http://rune.github.io/blog">Blog</a></strong>
+</p>
 
-[![Travis Build Status](https://travis-ci.org/pyroar/bluetooth.svg?branch=master)](https://travis-ci.org/pyroar/bluetooth)
-[![Coverage Status](https://coveralls.io/repos/pyroar/bluetooth/badge.svg?branch=master&service=github)](https://coveralls.io/github/pyroar/bluetooth?branch=master)
-[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![](http://meritbadge.herokuapp.com/bluetooth)](https://crates.io/crates/bluetooth)
+## rune
 
 A modern and lightweight module for Bluetooth Smart.
 
