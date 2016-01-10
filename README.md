@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://d13yacurqjgara.cloudfront.net/users/666205/screenshots/1758164/rune.jpg" alt="Rune" height="55%" width="55%">
+  <img src="info/logo.jpg" height="55%" width="55%">
 </p>
 <p align="center">
   <a href="https://travis-ci.org/pyroar/bluetooth">
@@ -15,7 +15,7 @@
   <strong><a href="http://rune.github.io/">Documentation</a> | <a href="http://rune.github.io/blog">Blog</a></strong>
 </p>
 
-## rune
+---
 
 A modern and lightweight module for Bluetooth Smart.
 
