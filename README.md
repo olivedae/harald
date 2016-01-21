@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="info/logo.jpg" height="55%" width="55%">
+  <img src="info/logo.jpg" height="40%" width="40%">
 </p>
 <p align="center">
   <a href="https://travis-ci.org/pyroar/bluetooth">
@@ -12,12 +12,13 @@
     <img src="https://coveralls.io/repos/pyroar/bluetooth/badge.svg?branch=master&service=github" alt="Coverage Status">
   </a>
   <br>
-  <strong><a href="http://rune.github.io/">Documentation</a> | <a href="http://rune.github.io/blog">Blog</a></strong>
 </p>
 
----
+#
 
-A modern and lightweight module for Bluetooth Smart.
+> A modern and lightweight module for Bluetooth Smart.
+
+[Documentation](http://rune.github.io/)
 
 ## Overview
 
