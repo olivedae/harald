@@ -3,7 +3,7 @@
 </p>
 <p align="center">
   <a href="https://travis-ci.org/rprotasov/rune">
-    <img src="https://img.shields.io/travis/rust-lang/rust.svg?style=flat-square" alt="Build Status">
+    <img src="https://travis-ci.org/rprotasov/rune.svg?branch=master" alt="Build Status">
   </a>
   <a href="https://crates.io/crates/bluetooth">
     <img src="http://meritbadge.herokuapp.com/bluetooth" alt="crates.io">
