@@ -10,3 +10,6 @@ keywords = ["bluetooth"]
 
 [dependencies.bytes]
 git = "https://github.com/carllerche/bytes"
+
+[dependencies.objc]
+version = "0.1.8"
