@@ -11,7 +11,7 @@
       Energy for Rust. Harald allows for elegant and
       logical communication between devices through
       using low-level, type-safe abstractions
-      over the Bluetooth stack's various protocols
+      over the Bluetooth's various protocols
       and procedures.
 
 
@@ -29,7 +29,7 @@
       For the moment there is a limited amount of
       required dependencies. However,
       using `cargo build` will take care of
-      installing what is need by Harald.
+      installing what is needed by Harald.
 
 
     ~ Where are the docs?
