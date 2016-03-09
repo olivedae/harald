@@ -1,8 +1,8 @@
 
 
-                          // Harald //
+                      \ | /  Harald  \ | /
 
-        It's quite an apt gatt, gap, and ap we have here.
+        It's quite an apt gatt, gap, and ap we have here
 
 
     ~ What is Harald?
@@ -14,6 +14,7 @@
       over the Bluetooth stack's various protocols
       and procedures.
 
+
     ~ Is it ready?
 
       Not quite. There are still significant features
@@ -22,12 +23,14 @@
       Features left to do and details to be ironed
       out can be found in issues.
 
+
     ~ What do I need?
 
       For the moment there is a limited amount of
       required dependencies. However,
       using `cargo build` will take care of
       installing what is need by Harald.
+
 
     ~ Where are the docs?
 
