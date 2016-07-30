@@ -1,0 +1,16 @@
+[project]
+name = "haraldcloud"
+version = "0.0.1"
+authors = ["Richard Protasov <richardprotasov@gmail.com>"]
+
+[dependencies]
+rustc-serialize = "0.3.19"
+hyper = "0.8.1"
+iron = "0.3.0"
+valico = "0.8.2"
+
+[dependencies.rustless]
+git = "https://github.com/rustless/rustless"
+
+[dependencies.curl]
+git = "https://github.com/alexcrichton/curl-rust"
