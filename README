@@ -11,7 +11,7 @@
       Energy for Rust. Harald allows for elegant and
       logical communication between devices through
       using low-level, type-safe abstractions
-      over the Bluetooth's various protocols
+      over Bluetooth's various protocols
       and procedures.
 
 
@@ -35,5 +35,3 @@
     ~ Where are the docs?
 
       *inconspicuous tumble weed*
-
-
