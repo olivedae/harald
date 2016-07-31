@@ -8,6 +8,10 @@ rustc-serialize = "0.3.19"
 hyper = "0.8.1"
 iron = "0.3.0"
 valico = "0.8.2"
+diesel = "0.6.1"
+diesel_codegen = { version = "0.6.1", default-features = false, features = ["nightly", "postgres"] }
+dotenv = "0.8.0"
+dotenv_macros = "0.8.0"
 
 [dependencies.rustless]
 git = "https://github.com/rustless/rustless"
