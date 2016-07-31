@@ -1,5 +1,5 @@
 [package]
-name = "bluetooth"
+name = "harald"
 version = "0.0.1"
 description = "A lightweight library for Bluetooth"
 readme = "README.md"
@@ -10,6 +10,3 @@ keywords = ["bluetooth"]
 
 [dependencies.bytes]
 git = "https://github.com/carllerche/bytes"
-
-[dependencies.objc]
-version = "0.1.8"
