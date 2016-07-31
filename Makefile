@@ -3,4 +3,4 @@
 .PHONY : start
 
 start:
-	cd libs/cloud && cargo run start
+	cd libs/server && cargo run start

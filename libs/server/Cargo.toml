@@ -1,5 +1,5 @@
 [project]
-name = "haraldcloud"
+name = "haraldserver"
 version = "0.0.1"
 authors = ["Richard Protasov <richardprotasov@gmail.com>"]
 
