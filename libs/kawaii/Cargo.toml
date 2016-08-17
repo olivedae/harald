@@ -1,0 +1,13 @@
+[project]
+name = "kawaii"
+version = "0.0.1"
+authors = ["Richard Protasov <richardprotasov@gmail.com>"]
+
+[dependencies]
+iron = "*"
+
+[dependencies.rustless]
+git = "https://github.com/rustless/rustless"
+
+[dependencies.curl]
+git = "https://github.com/alexcrichton/curl-rust"
